@@ -1,7 +1,7 @@
 import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import HomeScreen from '../screens/HomeScreen';
-import {View, Text, Image} from 'react-native';
+import {View, Image} from 'react-native';
 
 const Tab = createBottomTabNavigator();
 
@@ -11,11 +11,11 @@ const BottomTabNavigation = () => {
       initialRouteName="HomeScreen"
       screenOptions={{
         tabBarStyle: {
-          position: 'absolute',
-          bottom: 0,
+          // position: 'absolute',
+          // bottom: 0,
           borderTopColor: '#000',
           backgroundColor: '#000',
-          height: 80,
+          height: 70,
         },
         tabBarShowLabel: false,
         headerShown: false,
