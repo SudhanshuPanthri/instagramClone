@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -9,14 +9,88 @@ import {
   TouchableOpacity,
   Modal,
   TextInput,
+  PermissionsAndroid,
 } from 'react-native';
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import {firebase} from '../firebase/FirebaseConfig';
+import storage from '@react-native-firebase/storage';
+import auth from '@react-native-firebase/auth';
 import Story from '../components/Story';
 import {users} from '../data/userData';
 import Post from '../components/Post';
 
 const HomeScreen = ({navigation}) => {
   const [showModal, setShowModal] = useState(false);
-  const [image, setImage] = useState(false);
+  const [cameraImage, setCameraImage] = useState(null);
+  const [caption, setCaption] = useState('');
+
+  // function to open camera
+  //   camera options
+
+  let options = {
+    saveToPhotos: true,
+    mediaType: 'photo',
+  };
+
+  const openCamera = async () => {
+    const cameraPermission = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.CAMERA,
+    );
+    if (cameraPermission === PermissionsAndroid.RESULTS.GRANTED) {
+      const result = await launchCamera(options);
+      setCameraImage(result.assets[0].uri);
+    }
+  };
+
+  // function to open photo album
+
+  const openPhotoAlbum = async () => {
+    const result = await launchImageLibrary(options);
+    setCameraImage(result.assets[0].uri);
+  };
+
+  // function to upload data to firebase
+  const uploadData = async () => {
+    const response = await fetch(cameraImage);
+    const blob = await response.blob();
+    const task = storage()
+      .ref()
+      .child(`post/${auth().currentUser.uid}/${Math.random().toString(36)}`)
+      .put(blob);
+
+    const taskProgress = snapshot => {
+      console.log(`transferred: ${snapshot.bytesTransferred}`);
+    };
+
+    const taskCompleted = snapshot => {
+      snapshot.ref.getDownloadURL().then(snapshot => {
+        savePostData(snapshot);
+      });
+    };
+    const taskError = snapshot => {
+      console.log(snapshot);
+    };
+
+    task.on('state_changed', taskProgress, taskError, taskCompleted);
+  };
+
+  //function to save caption and image as postData
+
+  const savePostData = downloadURL => {
+    firebase
+      .firestore()
+      .collection('post')
+      .doc(auth().currentUser.uid)
+      .collection('userPosts')
+      .add({
+        downloadURL,
+        caption,
+        creation: new Date().getMilliseconds(),
+      })
+      .then(() => {
+        console.log('done');
+      });
+  };
 
   //function to open modal
   const OpenModal = () => {
@@ -36,8 +110,8 @@ const HomeScreen = ({navigation}) => {
           <View
             style={{
               position: 'absolute',
-              bottom: '10%',
-              height: 500,
+              bottom: 0,
+              height: 520,
               width: '100%',
               // justifyContent: 'center',
               alignItems: 'center',
@@ -50,7 +124,7 @@ const HomeScreen = ({navigation}) => {
                 height: '20%',
                 width: '100%',
                 alignItems: 'center',
-                justifyContent: 'space-evenly',
+                justifyContent: 'space-around',
                 flexDirection: 'row',
                 // marginTop: 20,
               }}>
@@ -70,9 +144,14 @@ const HomeScreen = ({navigation}) => {
                   placeholder="Write a caption..."
                   placeholderTextColor="#fff"
                   style={{color: '#fff'}}
+                  onChangeText={text => setCaption(text)}
                 />
               </View>
-              <TouchableOpacity onPress={() => setShowModal(!showModal)}>
+              <TouchableOpacity
+                onPress={() => {
+                  setShowModal(!showModal);
+                  uploadData();
+                }}>
                 <Text style={{color: '#405DE6'}}>Post</Text>
               </TouchableOpacity>
             </View>
@@ -84,14 +163,14 @@ const HomeScreen = ({navigation}) => {
                 justifyContent: 'center',
                 alignItems: 'center',
               }}>
-              {image ? (
+              {cameraImage !== null ? (
                 <Image
-                  source={require('../assets/user3.jpg')}
+                  source={{uri: cameraImage}}
                   style={{height: '100%', width: '100%', borderRadius: 50}}
                 />
               ) : (
                 <Text style={{color: '#fff'}}>
-                  Click an image or select one from photo album
+                  Select an image from camera or photo gallery to upload
                 </Text>
               )}
             </View>
@@ -110,7 +189,8 @@ const HomeScreen = ({navigation}) => {
                   justifyContent: 'center',
                   alignItems: 'center',
                   width: 50,
-                }}>
+                }}
+                onPress={() => openCamera()}>
                 <Image
                   source={require('../assets/camera.png')}
                   style={{height: 40, width: 40}}
@@ -124,7 +204,8 @@ const HomeScreen = ({navigation}) => {
                   width: 50,
                   justifyContent: 'center',
                   alignItems: 'center',
-                }}>
+                }}
+                onPress={() => openPhotoAlbum()}>
                 <Image
                   source={require('../assets/album.png')}
                   style={{height: 25, width: 25}}
