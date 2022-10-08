@@ -23,7 +23,37 @@ const HomeScreen = ({navigation}) => {
   const [showModal, setShowModal] = useState(false);
   const [cameraImage, setCameraImage] = useState(null);
   const [caption, setCaption] = useState('');
+  const [followingUsers, setFollowingUsers] = useState([]);
+  const [posts, setPosts] = useState([]);
 
+  //function to fetch user posts the current user follows
+  const fetchFollowingUsers = async () => {
+    await firebase
+      .firestore()
+      .collection('following')
+      .doc(auth().currentUser.uid)
+      .collection('userFollowing')
+      .get()
+      .then(snapshot => {
+        snapshot.docs.map(doc => {
+          setFollowingUsers(doc.data());
+          console.log(doc.data());
+        });
+      });
+    // followingUsers.map(item => {
+    //   console.log(item);
+    //   firebase
+    //     .firestore()
+    //     .collection('post')
+    //     .doc(item)
+    //     .collection('userPosts')
+    //     .orderBy('creation', 'desc')
+    //     .get()
+    //     .then(snapshot => {
+    //       console.log(snapshot.docs);
+    //     });
+    // });
+  };
   // function to open camera
   //   camera options
 
@@ -235,6 +265,10 @@ const HomeScreen = ({navigation}) => {
     );
   };
 
+  useEffect(() => {
+    fetchFollowingUsers();
+  }, []);
+
   return (
     <View style={styles.parent}>
       {/*header section*/}
@@ -248,7 +282,7 @@ const HomeScreen = ({navigation}) => {
           }}>
           <Image
             source={require('../assets/logo.png')}
-            style={{width: '45%', height: '50%'}}
+            style={{width: '45%', height: '45%'}}
           />
         </View>
         <OpenModal />
@@ -270,15 +304,15 @@ const HomeScreen = ({navigation}) => {
               style={{width: 30, height: 30, tintColor: '#fff'}}
             />
           </TouchableOpacity>
-          <TouchableOpacity>
-            <Image
-              source={require('../assets/dm.png')}
-              style={{width: 30, height: 30, tintColor: '#fff'}}
-            />
-          </TouchableOpacity>
-          <View style={styles.messageCounter}>
-            <Text style={{color: '#fff', fontWeight: '600'}}>4</Text>
-          </View>
+          {/*<TouchableOpacity>*/}
+          {/*  <Image*/}
+          {/*    source={require('../assets/dm.png')}*/}
+          {/*    style={{width: 30, height: 30, tintColor: '#fff'}}*/}
+          {/*  />*/}
+          {/*</TouchableOpacity>*/}
+          {/*<View style={styles.messageCounter}>*/}
+          {/*  <Text style={{color: '#fff', fontWeight: '600'}}>4</Text>*/}
+          {/*</View>*/}
         </View>
       </View>
       {/*stories section ye scroll hongi*/}

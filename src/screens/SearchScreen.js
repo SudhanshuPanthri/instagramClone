@@ -1,8 +1,15 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text, StyleSheet, TextInput, FlatList} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  FlatList,
+  TouchableOpacity,
+} from 'react-native';
 import {firebase} from '../firebase/FirebaseConfig';
 
-const SearchScreen = () => {
+const SearchScreen = ({navigation}) => {
   const [users, setUsers] = useState('');
   const [loading, setLoading] = useState(false);
   //fetching user from firebase
@@ -24,7 +31,6 @@ const SearchScreen = () => {
 
   return (
     <View style={styles.parent}>
-      {console.log(users)}
       <View
         style={{justifyContent: 'center', alignItems: 'center', marginTop: 20}}>
         <View
@@ -47,23 +53,30 @@ const SearchScreen = () => {
           />
         </View>
       </View>
-      {users !== '' ? (
+      {users !== '' && (
         <View>
           <FlatList
             data={users}
             numColumns={1}
             vertical={true}
             renderItem={user => (
-              <View>
-                {console.log(user._data.name)}
-                <Text style={{color: '#fff'}}>{user._data.name}</Text>
-              </View>
+              <TouchableOpacity
+                style={{
+                  height: 40,
+                  width: '100%',
+                  // borderWidth: 1,
+                  // borderColor: '#fff',
+                  padding: 10,
+                  justifyContent: 'center',
+                  marginTop: 5,
+                }}
+                onPress={() =>
+                  navigation.navigate('ProfileScreen', user.item._data.uid)
+                }>
+                <Text style={{color: '#fff'}}>{user.item._data.name}</Text>
+              </TouchableOpacity>
             )}
           />
-        </View>
-      ) : (
-        <View>
-          <Text style={{color: '#fff'}}>Loading</Text>
         </View>
       )}
     </View>
