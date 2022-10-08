@@ -7,6 +7,7 @@ import SignUpScreen from './src/screens/SignUpScreen';
 import HomeScreen from './src/screens/HomeScreen';
 import WelcomeScreen from './src/screens/WelcomeScreen';
 import BottomTabNavigation from './src/BottomTabs/BottomTabNavigation';
+import AccountScreen from './src/screens/AccountScreen';
 
 const App = () => {
   const Stack = createNativeStackNavigator();
