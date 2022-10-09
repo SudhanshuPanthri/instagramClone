@@ -60,8 +60,13 @@ const Post = user => {
                   alignItems: 'center',
                 }}>
                 <Image
-                  source=""
-                  style={{width: 40, height: 40, borderRadius: 50}}
+                  source={require('../assets/user.png')}
+                  style={{
+                    width: 30,
+                    height: 30,
+                    borderRadius: 50,
+                    tintColor: '#fff',
+                  }}
                 />
                 <Text
                   style={{
@@ -139,7 +144,7 @@ const Post = user => {
                 flexDirection: 'row',
               }}>
               <Text style={{color: '#fff'}}>Liked by </Text>
-              <Text style={{color: '#fff', fontWeight: '600'}}>sudhanshu</Text>
+              <Text style={{color: '#fff', fontWeight: '600'}}>sudhanshu </Text>
               <Text style={{color: '#fff'}}>and</Text>
               <Text style={{color: '#fff', fontWeight: '600'}}> others</Text>
             </View>
@@ -149,8 +154,12 @@ const Post = user => {
                 flexDirection: 'row',
                 marginTop: 5,
               }}>
-              <Text style={{color: '#fff', fontWeight: '600'}}>name</Text>
-              <Text style={{color: '#fff', marginLeft: 10}}>hello</Text>
+              <Text style={{color: '#fff', fontWeight: '600'}}>
+                {data.item._data.postedBy}
+              </Text>
+              <Text style={{color: '#fff', marginLeft: 10}}>
+                {data.item._data.caption}
+              </Text>
             </View>
             <View
               style={{

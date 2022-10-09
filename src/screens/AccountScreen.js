@@ -158,8 +158,8 @@ const AccountScreen = ({navigation}) => {
                 renderItem={post => (
                   <TouchableOpacity
                     style={{
-                      height: 120,
-                      width: 120,
+                      height: 125,
+                      width: 125,
                     }}>
                     <Image
                       source={{uri: post.item._data.downloadURL}}

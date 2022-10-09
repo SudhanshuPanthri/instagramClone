@@ -4,6 +4,8 @@ import HomeScreen from '../screens/HomeScreen';
 import {View, Image} from 'react-native';
 import AccountScreen from '../screens/AccountScreen';
 import SearchScreen from '../screens/SearchScreen';
+import LikeScreen from '../screens/LikeScreen';
+import ReelScreen from '../screens/ReelScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -62,7 +64,7 @@ const BottomTabNavigation = () => {
       />
       <Tab.Screen
         name="ReelScreen"
-        component=""
+        component={ReelScreen}
         options={{
           tabBarIcon: ({focused}) => (
             <View>
@@ -81,7 +83,7 @@ const BottomTabNavigation = () => {
       />
       <Tab.Screen
         name="LikeScreen"
-        component=""
+        component={LikeScreen}
         options={{
           tabBarIcon: ({focused}) => (
             <View>

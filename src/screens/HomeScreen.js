@@ -18,13 +18,13 @@ import auth from '@react-native-firebase/auth';
 import Story from '../components/Story';
 import {users} from '../data/userData';
 import Post from '../components/Post';
+import post from '../components/Post';
 
 const HomeScreen = ({navigation}) => {
   const [showModal, setShowModal] = useState(false);
   const [cameraImage, setCameraImage] = useState(null);
   const [caption, setCaption] = useState('');
   const [followingUsers, setFollowingUsers] = useState([]);
-  const [userData, setUserData] = useState([]);
   let name = '';
 
   //function to fetch user posts the current user follows
