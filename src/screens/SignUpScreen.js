@@ -17,21 +17,24 @@ const SignUpScreen = ({navigation}) => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const signUp = () => {
+  const signUp = async () => {
     if (password !== confirmPassword) {
       alert("Password doesn't match");
     } else {
-      auth()
+      await auth()
         .createUserWithEmailAndPassword(email, password)
         .then(userCredentials => {
           if (userCredentials?.user.uid) {
-            const userRef = firebase.firestore().collection('UserData');
-            userRef.add({
-              name,
-              email,
-              password,
-              uid: userCredentials?.user.uid,
-            });
+            firebase
+              .firestore()
+              .collection('UserData')
+              .doc(auth().currentUser.uid)
+              .set({
+                name,
+                email,
+                password,
+                uid: userCredentials?.user.uid,
+              });
           }
         });
     }

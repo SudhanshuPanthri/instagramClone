@@ -24,7 +24,8 @@ const HomeScreen = ({navigation}) => {
   const [cameraImage, setCameraImage] = useState(null);
   const [caption, setCaption] = useState('');
   const [followingUsers, setFollowingUsers] = useState([]);
-  const [posts, setPosts] = useState([]);
+  const [userData, setUserData] = useState([]);
+  let name = '';
 
   //function to fetch user posts the current user follows
   const fetchFollowingUsers = async () => {
@@ -35,24 +36,8 @@ const HomeScreen = ({navigation}) => {
       .collection('userFollowing')
       .get()
       .then(snapshot => {
-        snapshot.docs.map(doc => {
-          setFollowingUsers(doc.data());
-          console.log(doc.data());
-        });
+        setFollowingUsers(snapshot.docs);
       });
-    // followingUsers.map(item => {
-    //   console.log(item);
-    //   firebase
-    //     .firestore()
-    //     .collection('post')
-    //     .doc(item)
-    //     .collection('userPosts')
-    //     .orderBy('creation', 'desc')
-    //     .get()
-    //     .then(snapshot => {
-    //       console.log(snapshot.docs);
-    //     });
-    // });
   };
   // function to open camera
   //   camera options
@@ -106,16 +91,27 @@ const HomeScreen = ({navigation}) => {
 
   //function to save caption and image as postData
 
-  const savePostData = downloadURL => {
-    firebase
+  const savePostData = async downloadURL => {
+    await firebase
+      .firestore()
+      .collection('UserData')
+      .where('uid', '==', auth().currentUser.uid)
+      .get()
+      .then(snapshot => {
+        snapshot.docs.map(doc => {
+          name = doc.data().name;
+        });
+      });
+    await firebase
       .firestore()
       .collection('post')
       .doc(auth().currentUser.uid)
       .collection('userPosts')
       .add({
+        postedBy: name,
         downloadURL,
         caption,
-        creation: new Date().getMilliseconds(),
+        creation: new Date().getMilliseconds().toString(),
       })
       .then(() => {
         console.log('done');
@@ -286,6 +282,7 @@ const HomeScreen = ({navigation}) => {
           />
         </View>
         <OpenModal />
+        {/*{console.log(followingUsers)}*/}
         <View
           style={{
             flexDirection: 'row',
@@ -316,7 +313,7 @@ const HomeScreen = ({navigation}) => {
         </View>
       </View>
       {/*stories section ye scroll hongi*/}
-      <ScrollView>
+      <ScrollView vertical={true} showVerticalScrollIndicator={false}>
         <ScrollView style={styles.stories}>
           <FlatList
             data={users}
@@ -327,10 +324,8 @@ const HomeScreen = ({navigation}) => {
         </ScrollView>
         {/*posts.js aengi idhar*/}
         <FlatList
-          data={users}
-          keyExtractor={item => item.id}
-          renderItem={item => <Post user={item} />}
-          // vertical={true}
+          data={followingUsers}
+          renderItem={data => <Post postDetails={data.item} />}
         />
       </ScrollView>
     </View>
