@@ -6,6 +6,8 @@ import {
   Image,
   TouchableOpacity,
   FlatList,
+  Modal,
+  TextInput,
 } from 'react-native';
 import {firebase} from '../firebase/FirebaseConfig';
 // import auth from '@react-native-firebase/auth';
@@ -13,7 +15,9 @@ import {firebase} from '../firebase/FirebaseConfig';
 const Post = user => {
   const [click, setClick] = useState(false);
   const [posts, setPosts] = useState([]);
-  const [comments, setComments] = useState('user comment');
+  const [comments, setComments] = useState([]);
+  const [currentPost, setCurrentPost] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
   const getAllUserData = async () => {
     await firebase
@@ -27,18 +31,119 @@ const Post = user => {
       });
   };
 
-  const Comment = async id => {
+  const comment = async id => {
     await firebase
       .firestore()
       .collection('post')
       .doc(user.postDetails._data.data)
       .collection('userPosts')
-      .doc()
-      .collection('comments')
-      .add({
-        comments,
+      .get()
+      .then(snapshot => {
+        setCurrentPost(snapshot.docs[id]);
       });
-    // console.log(id);
+    getComments();
+  };
+
+  const addComment = async () => {
+    await firebase
+      .firestore()
+      .collection('post')
+      .doc(user.postDetails._data.data)
+      .collection('userPosts')
+      .doc(currentPost.id)
+      .collection('comments')
+      .add({comments});
+  };
+
+  const getComments = async () => {
+    await firebase
+      .firestore()
+      .collection('post')
+      .doc(user.postDetails._data.data)
+      .collection('userPosts')
+      .doc(currentPost.id)
+      .collection('comments')
+      .get()
+      .then(snapshot => {
+        snapshot.docs.map(doc => {
+          setComments(doc.data());
+        });
+      });
+    // addComment();
+  };
+
+  const OpenModal = () => {
+    return (
+      <View
+        style={{
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: 300,
+          backgroundColor: '#fff',
+          position: 'absolute',
+        }}>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={showModal}
+          onRequestClose={() => {
+            setShowModal(!showModal);
+          }}>
+          <View
+            style={{
+              position: 'absolute',
+              bottom: 0,
+              height: 520,
+              width: '100%',
+              alignItems: 'center',
+              backgroundColor: '#000',
+              borderTopLeftRadius: 16,
+              borderTopRightRadius: 16,
+            }}>
+            <View>
+              <TextInput />
+            </View>
+            <FlatList
+              data={comments.comments}
+              renderItem={data => (
+                <View
+                  style={{
+                    borderWidth: 1,
+                    borderColor: '#fff',
+                    width: 300,
+                    marginVertical: 10,
+                    justifyContent: 'center',
+                    padding: 10,
+                  }}>
+                  <View>
+                    <Text style={{color: '#fff', fontSize: 16}}>
+                      {data.item}
+                    </Text>
+                  </View>
+                </View>
+              )}
+            />
+            <TouchableOpacity
+              style={{
+                borderWidth: 1,
+                borderColor: '#fff',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: 50,
+                width: 50,
+                borderRadius: 50,
+                marginTop: 40,
+              }}
+              onPress={() => setShowModal(!showModal)}>
+              <Image
+                source={require('../assets/close.png')}
+                style={{width: 25, height: 25}}
+              />
+            </TouchableOpacity>
+          </View>
+        </Modal>
+      </View>
+    );
   };
 
   useEffect(() => {
@@ -115,12 +220,17 @@ const Post = user => {
                     }}
                   />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => Comment(data.index)}>
+                <TouchableOpacity
+                  onPress={() => {
+                    comment(data.index);
+                    setShowModal(!showModal);
+                  }}>
                   <Image
                     source={require('../assets/comment.png')}
                     style={{tintColor: '#fff', height: 25, width: 25}}
                   />
                 </TouchableOpacity>
+                <OpenModal />
                 <TouchableOpacity>
                   <Image
                     source={require('../assets/share.png')}
