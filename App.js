@@ -4,11 +4,10 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import SignInScreen from './src/screens/SignInScreen';
 import SignUpScreen from './src/screens/SignUpScreen';
-import HomeScreen from './src/screens/HomeScreen';
 import WelcomeScreen from './src/screens/WelcomeScreen';
 import BottomTabNavigation from './src/BottomTabs/BottomTabNavigation';
-import AccountScreen from './src/screens/AccountScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
+// import Comment from './src/components/Comment';
 
 const App = () => {
   const Stack = createNativeStackNavigator();
@@ -40,6 +39,11 @@ const App = () => {
           component={ProfileScreen}
           options={{headerShown: false}}
         />
+        {/*<Stack.Screen*/}
+        {/*  name="Comment"*/}
+        {/*  component={Comment}*/}
+        {/*  options={{headerShown: false}}*/}
+        {/*/>*/}
         <Stack.Screen
           name="BottomTabNavigation"
           component={BottomTabNavigation}

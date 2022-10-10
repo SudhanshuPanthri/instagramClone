@@ -8,25 +8,14 @@ import {
   FlatList,
 } from 'react-native';
 import {firebase} from '../firebase/FirebaseConfig';
-import auth from '@react-native-firebase/auth';
+// import auth from '@react-native-firebase/auth';
 
 const Post = user => {
   const [click, setClick] = useState(false);
   const [posts, setPosts] = useState([]);
-  console.log(user.postDetails._data.data);
+  const [comments, setComments] = useState('user comment');
 
   const getAllUserData = async () => {
-    // await firebase
-    //   .firestore()
-    //   .collection('post')
-    //   .doc(user.postDetails._data.data)
-    //   .collection('userPosts')
-    //   .doc(auth().currentUser.uid)
-    //   .get()
-    //   .then(snapshot => {
-    //     setPosts(snapshot.docs);
-    //   });
-    // console.log(posts);
     await firebase
       .firestore()
       .collection('post')
@@ -35,11 +24,23 @@ const Post = user => {
       .get()
       .then(snapshot => {
         setPosts(snapshot.docs);
-        console.log(snapshot.docs);
       });
-    console.log(posts);
   };
-  //
+
+  const Comment = async id => {
+    await firebase
+      .firestore()
+      .collection('post')
+      .doc(user.postDetails._data.data)
+      .collection('userPosts')
+      .doc()
+      .collection('comments')
+      .add({
+        comments,
+      });
+    // console.log(id);
+  };
+
   useEffect(() => {
     getAllUserData();
   }, []);
@@ -114,7 +115,7 @@ const Post = user => {
                     }}
                   />
                 </TouchableOpacity>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => Comment(data.index)}>
                   <Image
                     source={require('../assets/comment.png')}
                     style={{tintColor: '#fff', height: 25, width: 25}}
@@ -167,7 +168,9 @@ const Post = user => {
                 flexDirection: 'row',
                 marginVertical: 5,
               }}>
-              <Text style={{color: '#8c8c8c'}}>1 min</Text>
+              <Text style={{color: '#8c8c8c'}}>
+                Posted At : {data.item._data.creation}
+              </Text>
             </View>
           </View>
         )}

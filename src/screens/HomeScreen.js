@@ -27,7 +27,7 @@ const HomeScreen = ({navigation}) => {
   const [followingUsers, setFollowingUsers] = useState([]);
   let name = '';
 
-  //function to fetch user posts the current user follows
+  //function to fetch users the current user follows
   const fetchFollowingUsers = async () => {
     await firebase
       .firestore()
@@ -111,13 +111,12 @@ const HomeScreen = ({navigation}) => {
         postedBy: name,
         downloadURL,
         caption,
-        creation: new Date().getMilliseconds().toString(),
+        creation: new Date().toLocaleTimeString(),
       })
       .then(() => {
         console.log('done');
       });
   };
-
   //function to open modal
   const OpenModal = () => {
     return (

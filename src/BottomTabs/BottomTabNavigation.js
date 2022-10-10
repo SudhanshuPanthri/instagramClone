@@ -114,7 +114,6 @@ const BottomTabNavigation = () => {
                   height: 30,
                   borderWidth: 3,
                   borderColor: '#fff',
-                  // tintColor: focused && '#fff',
                 }}
                 resizeMode="contain"
               />
